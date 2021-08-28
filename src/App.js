@@ -8,10 +8,21 @@
  */
 import './App.css';
 import { useState, useCallback, useEffect } from 'react';
-import { csv } from 'd3-fetch';
-import { message } from './modules/message';
+import { csv, arc, pie } from 'd3';
+// import {message} from './components/02. visualizingData/message'
+
+const width = 960;
+const height = 500;
+const centerX = width/2;
+const centerY = height/2;
 
 const csvUrl = "https://gist.githubusercontent.com/nafiul-nipu/32fe283bbec1fb814903d67a4cb45b36/raw/cssNamedColors.csv"
+
+const pieArc = arc()
+                .innerRadius(0)
+                .outerRadius(width)
+
+const colorPie = pie().value(1)
 
 function App() {
   const [data, setData] = useState(null)
@@ -21,11 +32,37 @@ function App() {
     csv(csvUrl).then(setData);
   }, []);
 
-  
+  if(!data){
+    return <pre>Loading ...</pre>
+  }
 
   return (
-    <div>{data ? message(data)  : "loading"}</div>    
+    <svg width={width} height={height}>
+      <g transform={`translate(${centerX}, ${centerY})`}>
+          {colorPie(data)
+            .map( (d,i) => (
+            <path
+              key={i}
+              fill={d.data['RGB hex value']}
+              d={pieArc(d)}
+            
+            />))}
+
+
+        {/* {data.map( (d, i) => (
+          <path
+            key={i}
+            fill={d['RGB hex value']}
+            d={pieArc({
+              startAngle: i / data.length * 2 * Math.PI,
+              endAngle: (i + 1) / data.length * 2 * Math.PI
+            })}
+          
+          />))} */}
+      </g>
+    </svg>
   );
+
 }
 
 export default App;

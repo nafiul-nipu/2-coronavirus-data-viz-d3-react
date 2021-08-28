@@ -1,32 +1,30 @@
+/**
+ * useEffect is used to manage a side effect
+ * for example, let's say if the csv updates then
+ * we will fetch more data - in this case we will
+ * call useEffect
+ * first argument - a function
+ * second argument - a dependency
+ */
 import './App.css';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { csv } from 'd3-fetch';
+import { message } from './modules/message';
 
-const width = 960;
-const height = 500;
-const circleRadius = 30
-
-const initialMousePosition = {x: width/2, y: height/2}
-
-
+const csvUrl = "https://gist.githubusercontent.com/nafiul-nipu/32fe283bbec1fb814903d67a4cb45b36/raw/cssNamedColors.csv"
 
 function App() {
-  const [mousPosition, setMousePosition] = useState(initialMousePosition)
+  const [data, setData] = useState(null)
 
-  const handleMouseMove = useCallback((event) => {
-    const {clientX, clientY} = event
-    setMousePosition({x: clientX, y: clientY})
-  }, [setMousePosition]);
+  useEffect(() =>{
+    // //  loadding the data
+    csv(csvUrl).then(setData);
+  }, []);
+
+  
 
   return (
-    <svg width={width} height={height} onMouseMove={handleMouseMove}>    
-        
-      <circle
-        cx={mousPosition.x}
-        cy={mousPosition.y}
-        r={circleRadius}
-      />
-
-    </svg>
+    <div>{data ? message(data)  : "loading"}</div>    
   );
 }
 
